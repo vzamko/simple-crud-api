@@ -5,6 +5,7 @@ const postHandler = require('./src/handlers/postHandler');
 const putHandler = require('./src/handlers/putHandler');
 const deleteHandler = require('./src/handlers/deleteHandler');
 const personValidator = require('./src/validators/personValidator');
+const uuidValidator = require('./src/validators/uuidValidator');
 
 const server = http.createServer();
 server.listen(4444);
@@ -14,67 +15,79 @@ server.on('request', (request, response) => {
   let page = url[1];
   let userId = url[2];
 
+  if (uuidValidator(userId, response)) {
+    return;
+  }
+
   switch (request.method) {
     case 'GET':
       switch (page) {
         case 'person':
           getHandler(response, userId);
 
-          break;
+          return;
         default:
-          notFountHandler(response);
+          notFountHandler(response, request.url);
       }
 
-      break;
+      return;
 
     case 'POST':
       switch (page) {
         case 'person':
+          if (userId) {
+            response.writeHead(400, {'Content-Type': 'text/html'});
+            response.write('The person ID is superfluous.');
+            response.end();
+          }
+
           postHandler(request, response);
 
-          break;
+          return;
         default:
-          notFountHandler(response);
+          notFountHandler(response, request.url);
       }
 
-      break;
+      return;
 
     case 'PUT':
       switch (page) {
         case 'person':
           if (personValidator(userId, response)) {
-            break;
+            return;
           }
 
           putHandler(request, response, userId);
 
-          break;
+          return;
         default:
           notFountHandler(response);
       }
 
-      break;
+      return;
 
     case 'DELETE':
       switch (page) {
         case 'person':
           if (personValidator(userId, response)) {
-            break;
+            return;
           }
 
           deleteHandler(response, userId);
 
-          break;
+          return;
         default:
           notFountHandler(response);
       }
 
-      break;
+      return;
 
     default:
       response.writeHead(500);
       response.write('Wrong method.');
       response.end();
+
+      return;
   }
 });
 
