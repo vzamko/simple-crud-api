@@ -2,6 +2,12 @@
   "name": "simple-crud-api",
   "version": "1.0.0",
   "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "prettier": "npx prettier --write ."
+  },
   "repository": "git@github.com:vzamko/simple-crud-api.git",
   "author": "Valera Zamko <valery.zamko@gmail.com>",
   "license": "MIT",
