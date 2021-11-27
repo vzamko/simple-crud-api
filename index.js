@@ -1,5 +1,10 @@
 const http = require('http');
-const { getDatabase, getPersonById, addPerson, changePerson, removePerson } = require('./src/database/database');
+const notFountHandler = require('./src/handlers/notFountHandler');
+const getHandler = require('./src/handlers/getHandler');
+const postHandler = require('./src/handlers/postHandler');
+const putHandler = require('./src/handlers/putHandler');
+const deleteHandler = require('./src/handlers/deleteHandler');
+const personValidator = require('./src/validators/personValidator');
 
 const server = http.createServer();
 server.listen(4444);
@@ -13,19 +18,11 @@ server.on('request', (request, response) => {
     case 'GET':
       switch (page) {
         case 'person':
-          response.writeHead(200, {"Content-Type": "application/json"});
+          getHandler(response, userId);
 
-          if (userId) {
-            response.write(JSON.stringify(getPersonById(userId)));
-          } else {
-            response.write(JSON.stringify(getDatabase()));
-          }
-
-          response.end();
           break;
         default:
-          response.write('Not fount');
-          response.end();
+          notFountHandler(response);
       }
 
       break;
@@ -33,72 +30,44 @@ server.on('request', (request, response) => {
     case 'POST':
       switch (page) {
         case 'person':
-          let body = '';
+          postHandler(request, response);
 
-          request.on('data', (data) => {
-            body += data;
-
-            if (body.length > 1e6) {
-              request.connection.destroy();
-            }
-          })
-          request.on('end', () => {
-            addPerson(JSON.parse(body));
-
-            response.writeHead(201, {'Content-Type': 'text/html'});
-            response.write('User ' + body.name + ' has been created.');
-            response.end();
-          })
           break;
         default:
-          response.write('Not fount');
-          response.end();
+          notFountHandler(response);
       }
 
       break;
 
     case 'PUT':
-      if (!userId) {
-        response.writeHead(400, {'Content-Type': 'text/html'});
-        response.write('Person ID is required.');
-        response.end();
+      switch (page) {
+        case 'person':
+          if (personValidator(userId, response)) {
+            break;
+          }
 
-        break;
+          putHandler(request, response, userId);
+
+          break;
+        default:
+          notFountHandler(response);
       }
-
-      if (getPersonById(userId) === 'Person does not exist.') {
-        response.writeHead(404, {'Content-Type': 'text/html'});
-        response.write('User ID ' + userId + ' does not exist.');
-        response.end();
-
-        break;
-      }
-
-      let body = '';
-
-      request.on('data', (data) => {
-        body += data;
-
-        if (body.length > 1e6) {
-          request.connection.destroy();
-        }
-      });
-
-      request.on('end', () => {
-        changePerson(userId, JSON.parse(body));
-
-        response.writeHead(200, {'Content-Type': 'text/html'});
-        response.write('User with ID ' + userId + ' has been update.');
-        response.end();
-      });
 
       break;
 
     case 'DELETE':
-      removePerson(userId);
+      switch (page) {
+        case 'person':
+          if (personValidator(userId, response)) {
+            break;
+          }
 
-      response.writeHead(204, {'Content-Type': 'text/html'});
-      response.end();
+          deleteHandler(response, userId);
+
+          break;
+        default:
+          notFountHandler(response);
+      }
 
       break;
 
