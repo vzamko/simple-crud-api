@@ -1,3 +1,4 @@
+require('dotenv').config();
 const http = require('http');
 const notFountHandler = require('./src/handlers/notFountHandler');
 const getHandler = require('./src/handlers/getHandler');
@@ -8,12 +9,18 @@ const personValidator = require('./src/validators/personValidator');
 const uuidValidator = require('./src/validators/uuidValidator');
 
 const server = http.createServer();
-server.listen(4444);
+server.listen(process.env.PORT);
 
 server.on('request', (request, response) => {
   let url = request.url.split("/");
   let page = url[1];
   let userId = url[2];
+
+  if (page !== 'person') {
+    notFountHandler(response, page);
+
+    return;
+  }
 
   if (uuidValidator(userId, response)) {
     return;
@@ -91,4 +98,4 @@ server.on('request', (request, response) => {
   }
 });
 
-console.log('Server running at http://127.0.0.1:4444/');
+console.log('Server running at http://127.0.0.1:' + process.env.PORT + '/');
