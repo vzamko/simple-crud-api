@@ -1,23 +1,23 @@
-require('dotenv').config();
-const http = require('http');
-const notFountHandler = require('./src/handlers/notFountHandler');
-const getHandler = require('./src/handlers/getHandler');
-const postHandler = require('./src/handlers/postHandler');
-const putHandler = require('./src/handlers/putHandler');
-const deleteHandler = require('./src/handlers/deleteHandler');
-const personValidator = require('./src/validators/personValidator');
-const uuidValidator = require('./src/validators/uuidValidator');
-const serverErrorHandler = require('./src/handlers/serverErrorHandler');
+require("dotenv").config();
+const http = require("http");
+const notFountHandler = require("./src/handlers/notFountHandler");
+const getHandler = require("./src/handlers/getHandler");
+const postHandler = require("./src/handlers/postHandler");
+const putHandler = require("./src/handlers/putHandler");
+const deleteHandler = require("./src/handlers/deleteHandler");
+const personValidator = require("./src/validators/personValidator");
+const uuidValidator = require("./src/validators/uuidValidator");
+const serverErrorHandler = require("./src/handlers/serverErrorHandler");
 
 const server = http.createServer();
 server.listen(process.env.PORT);
 
-server.on('request', (request, response) => {
+server.on("request", (request, response) => {
   let url = request.url.split("/");
   let page = url[1];
   let userId = url[2];
 
-  if (page !== 'person') {
+  if (page !== "person") {
     notFountHandler(response, page);
 
     return;
@@ -28,15 +28,14 @@ server.on('request', (request, response) => {
   }
 
   switch (request.method) {
-    case 'GET':
+    case "GET":
       switch (page) {
-        case 'person':
+        case "person":
           try {
             getHandler(response, userId);
           } catch (e) {
             serverErrorHandler(response);
           }
-
 
           return;
         default:
@@ -45,12 +44,12 @@ server.on('request', (request, response) => {
 
       return;
 
-    case 'POST':
+    case "POST":
       switch (page) {
-        case 'person':
+        case "person":
           if (userId) {
-            response.writeHead(400, {'Content-Type': 'application/json'});
-            response.write('The person ID is superfluous.');
+            response.writeHead(400, { "Content-Type": "application/json" });
+            response.write("The person ID is superfluous.");
             response.end();
 
             return;
@@ -69,9 +68,9 @@ server.on('request', (request, response) => {
 
       return;
 
-    case 'PUT':
+    case "PUT":
       switch (page) {
-        case 'person':
+        case "person":
           if (personValidator(userId, response)) {
             return;
           }
@@ -89,9 +88,9 @@ server.on('request', (request, response) => {
 
       return;
 
-    case 'DELETE':
+    case "DELETE":
       switch (page) {
-        case 'person':
+        case "person":
           if (personValidator(userId, response)) {
             return;
           }
@@ -111,13 +110,13 @@ server.on('request', (request, response) => {
 
     default:
       response.writeHead(405);
-      response.write('Method ' + request.method + ' is not support.');
+      response.write("Method " + request.method + " is not support.");
       response.end();
 
       return;
   }
 });
 
-console.log('Server running at http://127.0.0.1:' + process.env.PORT + '/');
+console.log("Server running at http://127.0.0.1:" + process.env.PORT + "/");
 
 module.exports = server;

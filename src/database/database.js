@@ -1,4 +1,4 @@
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require("uuid");
 
 let database = {};
 
@@ -7,7 +7,7 @@ const getDatabase = () => {
 };
 
 const getPersonById = (id) => {
-  return database[id] ?? 'Person does not exist.';
+  return database[id] ?? "Person does not exist.";
 };
 
 const addPerson = (data) => {
@@ -16,20 +16,20 @@ const addPerson = (data) => {
   database[personId] = {
     name: data.name,
     age: data.age,
-    hobbies: data.hobbies
+    hobbies: data.hobbies,
   };
 
   return {
     status: true,
-    id: personId
+    id: personId,
   };
 };
 
 const changePerson = (personId, data) => {
-  database[personId] = {...database[personId], ...data};
+  database[personId] = { ...database[personId], ...data };
 
   return true;
-}
+};
 
 const removePerson = (personId) => {
   delete database[personId];
@@ -37,4 +37,10 @@ const removePerson = (personId) => {
   return true;
 };
 
-module.exports = { getDatabase, getPersonById, addPerson, changePerson, removePerson };
+module.exports = {
+  getDatabase,
+  getPersonById,
+  addPerson,
+  changePerson,
+  removePerson,
+};

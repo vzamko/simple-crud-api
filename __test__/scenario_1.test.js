@@ -1,9 +1,9 @@
 const request = require("supertest");
-const server = require('../index');
+const server = require("../index");
 
 afterAll(() => server.close());
 
-describe('Check general functionality:', () => {
+describe("Check general functionality:", () => {
   let id;
 
   test("GET method must return empty body.", async () => {
@@ -14,11 +14,12 @@ describe('Check general functionality:', () => {
   });
 
   test("POST method must create a new person.", async () => {
-    const response = await request(server).post("/person")
+    const response = await request(server)
+      .post("/person")
       .send({
         name: "Valera",
         age: 27,
-        hobbies: ["games"]
+        hobbies: ["games"],
       });
 
     id = response.body.id;
@@ -31,12 +32,18 @@ describe('Check general functionality:', () => {
     const response = await request(server).get("/person/" + id);
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual({id: id, name: "Valera", age: 27, hobbies: ["games"]});
+    expect(response.body).toEqual({
+      id: id,
+      name: "Valera",
+      age: 27,
+      hobbies: ["games"],
+    });
   });
 
   test("PUT method must change user.", async () => {
-    const response = await request(server).put("/person/" + id)
-      .send({hobbies: ["eat"]});
+    const response = await request(server)
+      .put("/person/" + id)
+      .send({ hobbies: ["eat"] });
 
     expect(response.status).toBe(200);
   });
@@ -45,7 +52,12 @@ describe('Check general functionality:', () => {
     const response = await request(server).get("/person/" + id);
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual({id: id, name: "Valera", age: 27, hobbies: ["eat"]});
+    expect(response.body).toEqual({
+      id: id,
+      name: "Valera",
+      age: 27,
+      hobbies: ["eat"],
+    });
   });
 
   test("DELETE method must remove user.", async () => {

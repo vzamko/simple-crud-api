@@ -3,7 +3,11 @@ const createValidator = (data) => {
     return true;
   }
 
-  return typeof data.name !== 'string' || !Number.isInteger(Number.parseInt(data.age)) || !Array.isArray(data.hobbies);
-}
+  return (
+    typeof data.name !== "string" ||
+    !Number.isInteger(Number.parseInt(data.age)) ||
+    !Array.isArray(data.hobbies)
+  );
+};
 
 module.exports = createValidator;
