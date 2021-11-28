@@ -1,5 +1,6 @@
-const { changePerson } = require('../database/database');
+const { changePerson, getPersonById } = require('../database/database');
 const jsonValidator = require('../validators/jsonValidator');
+const serverErrorHandler = require('./serverErrorHandler');
 
 const putHandler = (request, response, userId) => {
   let body = '';
@@ -14,17 +15,23 @@ const putHandler = (request, response, userId) => {
 
   request.on('end', () => {
     if (jsonValidator(body)) {
-      response.writeHead(500, {'Content-Type': 'text/html'});
-      response.write(jsonValidator(body));
+      response.writeHead(500, {'Content-Type': 'application/json'});
+      response.write(JSON.stringify(jsonValidator(body)));
       response.end();
 
       return;
     }
 
-    changePerson(userId, JSON.parse(body));
+    try {
+      changePerson(userId, JSON.parse(body));
+    } catch (e) {
+      serverErrorHandler(response);
+    }
 
-    response.writeHead(200, {'Content-Type': 'text/html'});
-    response.write('User with ID ' + userId + ' has been updated.');
+    let message = {id: userId, ...getPersonById(userId)};
+
+    response.writeHead(200, {'Content-Type': 'application/json'});
+    response.write(JSON.stringify(message));
     response.end();
   });
 }

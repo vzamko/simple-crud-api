@@ -9,7 +9,9 @@ const getHandler = (response, userId) => {
       return;
     }
 
-    response.write(JSON.stringify(getPersonById(userId)));
+    let user = {id: userId, ...getPersonById(userId)};
+
+    response.write(JSON.stringify(user));
   } else {
     response.write(JSON.stringify(getDatabase()));
   }

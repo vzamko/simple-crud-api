@@ -7,6 +7,7 @@ const putHandler = require('./src/handlers/putHandler');
 const deleteHandler = require('./src/handlers/deleteHandler');
 const personValidator = require('./src/validators/personValidator');
 const uuidValidator = require('./src/validators/uuidValidator');
+const serverErrorHandler = require('./src/handlers/serverErrorHandler');
 
 const server = http.createServer();
 server.listen(process.env.PORT);
@@ -30,7 +31,12 @@ server.on('request', (request, response) => {
     case 'GET':
       switch (page) {
         case 'person':
-          getHandler(response, userId);
+          try {
+            getHandler(response, userId);
+          } catch (e) {
+            serverErrorHandler(response);
+          }
+
 
           return;
         default:
@@ -43,12 +49,18 @@ server.on('request', (request, response) => {
       switch (page) {
         case 'person':
           if (userId) {
-            response.writeHead(400, {'Content-Type': 'text/html'});
+            response.writeHead(400, {'Content-Type': 'application/json'});
             response.write('The person ID is superfluous.');
             response.end();
+
+            return;
           }
 
-          postHandler(request, response);
+          try {
+            postHandler(request, response);
+          } catch (e) {
+            serverErrorHandler(response);
+          }
 
           return;
         default:
@@ -64,7 +76,11 @@ server.on('request', (request, response) => {
             return;
           }
 
-          putHandler(request, response, userId);
+          try {
+            putHandler(request, response, userId);
+          } catch (e) {
+            serverErrorHandler(response);
+          }
 
           return;
         default:
@@ -80,7 +96,11 @@ server.on('request', (request, response) => {
             return;
           }
 
-          deleteHandler(response, userId);
+          try {
+            deleteHandler(response, userId);
+          } catch (e) {
+            serverErrorHandler(response);
+          }
 
           return;
         default:
@@ -90,8 +110,8 @@ server.on('request', (request, response) => {
       return;
 
     default:
-      response.writeHead(500);
-      response.write('Wrong method.');
+      response.writeHead(405);
+      response.write('Method ' + request.method + ' is not support.');
       response.end();
 
       return;
@@ -99,3 +119,5 @@ server.on('request', (request, response) => {
 });
 
 console.log('Server running at http://127.0.0.1:' + process.env.PORT + '/');
+
+module.exports = server;

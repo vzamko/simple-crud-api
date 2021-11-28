@@ -1,20 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 
-let database = {
-  "990f6247-261b-4041-9558-5ba8e852db1f": {
-    name: 'anonymous',
-    age: 0,
-    hobbies: []
-  },
-  [uuidv4()]: {
-    name: "Valera",
-    age: "27",
-    hobbies: [
-      "games",
-      "music"
-    ]
-  }
-};
+let database = {};
 
 const getDatabase = () => {
   return database;
@@ -25,13 +11,18 @@ const getPersonById = (id) => {
 };
 
 const addPerson = (data) => {
-  database[uuidv4()] = {
+  let personId = uuidv4();
+
+  database[personId] = {
     name: data.name,
     age: data.age,
     hobbies: data.hobbies
   };
 
-  return true;
+  return {
+    status: true,
+    id: personId
+  };
 };
 
 const changePerson = (personId, data) => {
